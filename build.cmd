@@ -54,13 +54,13 @@ goto done
 :debug
 @echo Building debug in build\win\debug with Ninja
 cmake -G "Ninja" -B build\win\debug -S . -DCMAKE_BUILD_TYPE=Debug  
-ninja -v -C build\win\debug all package
+ninja -v -C build\win\debug all
 goto done
 
 :release
 @echo Building release in build\win\release with Ninja
 cmake -G "Ninja" -B build\win\release -S . -DCMAKE_BUILD_TYPE=Release 
-ninja -v -C build\win\release all package
+ninja -v -C build\win\release all
 goto done
 
 :done

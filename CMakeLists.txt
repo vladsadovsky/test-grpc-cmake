@@ -22,7 +22,10 @@ set(_GRPC_GRPCPP grpc++)
 
 # Proto file location - to be added as an include directory later
 get_filename_component(GT_PROTO "./proto/gt.proto" ABSOLUTE)
-get_filename_component(GT_PROTO_PATH "${gt_proto}" PATH)
+get_filename_component(GT_PROTO_PATH "${GT_PROTO}" PATH)
+
+message(STATUS "GT_PROTO=${GT_PROTO}")
+message(STATUS "GT_PROTO_PATH=${GT_PROTO_PATH}")
 
 # Run protobuf compiler as a custom step
 set(GT_PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/gt.pb.cc")
