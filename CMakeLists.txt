@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14.1)
 
 project(HelloWorld C CXX)
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 14)
 find_package(Threads REQUIRED)
 
 #Nb: use specific tag for grpc release - to avoid default to latest
@@ -23,9 +23,6 @@ set(_GRPC_GRPCPP grpc++)
 # Proto file location - to be added as an include directory later
 get_filename_component(GT_PROTO "./proto/gt.proto" ABSOLUTE)
 get_filename_component(GT_PROTO_PATH "${GT_PROTO}" PATH)
-
-message(STATUS "GT_PROTO=${GT_PROTO}")
-message(STATUS "GT_PROTO_PATH=${GT_PROTO_PATH}")
 
 # Run protobuf compiler as a custom step
 set(GT_PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/gt.pb.cc")

@@ -1,0 +1,3 @@
+#define SERVER_LISTEN_PORT  5001
+#define SERVER_LISTEN_ADDRESS_STR "0.0.0.0:5001"
+#define TARGET_STR "localhost:5001"

@@ -1,10 +1,16 @@
+/*
+ * grpc test/example -- server side
+ */
+
 #include <iostream>
 #include <memory>
 #include <string>
 
-#include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include "common.h"
+
+//#include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <grpcpp/grpcpp.h>
-#include <grpcpp/health_check_service_interface.h>
+//#include <grpcpp/health_check_service_interface.h>
 
 #include "gt.grpc.pb.h"
 
@@ -12,33 +18,30 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-using gt::Greeter;
-using gt::HelloReply;
-using gt::HelloRequest;
+using gt::GT;
+using gt::GTWelcomeReply;
+using gt::GTWelcomeRequest;
+
+
 
 // Logic and data behind the server's behavior.
-class GreeterServiceImpl final : public Greeter::Service {
-  Status SayHello(ServerContext* context, const HelloRequest* request,
-                  HelloReply* reply) override {
-    std::string prefix("Hello ");
+class GTServiceImpl final : public GT::Service {
+  Status Welcome(ServerContext* context, const GTWelcomeRequest* request,
+                  GTWelcomeReply* reply) override {
+    std::string prefix("GRPC Test Server welcomes you: ");
     reply->set_message(prefix + request->name());
     return Status::OK;
   }
 };
 
 void RunServer() {
-  std::string server_address("0.0.0.0:50051");
-  GreeterServiceImpl service;
+  std::string server_address(SERVER_LISTEN_ADDRESS_STR);
+  GTServiceImpl service;
 
-  grpc::EnableDefaultHealthCheckService(true);
-  grpc::reflection::InitProtoReflectionServerBuilderPlugin();
   ServerBuilder builder;
-  // Listen on the given address without any authentication mechanism.
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  // Register "service" as the instance through which we'll communicate with
-  // clients. In this case it corresponds to an *synchronous* service.
   builder.RegisterService(&service);
-  // Finally assemble the server.
+
   std::unique_ptr<Server> server(builder.BuildAndStart());
   std::cout << "Server listening on " << server_address << std::endl;
 
@@ -48,7 +51,9 @@ void RunServer() {
 }
 
 int main(int argc, char** argv) {
+  std::cout << " GRPC Test Welcome server started" << std::endl;
   RunServer();
+  std::cout << " GRPC Test Welcome server exiting" << std::endl;
 
   return 0;
 }

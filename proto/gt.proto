@@ -1,24 +1,24 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "io.grpc.examples.gt";
-option java_outer_classname = "gtProto";
+option java_package = "io.vlads.test.gt";
+option java_outer_classname = "GTProto";
 option objc_class_prefix = "GT";
 
 package gt;
 
 // The greeting service definition.
-service Greeter {
+service GT {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc Welcome (GTWelcomeRequest) returns (GTWelcomeReply) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
+message GTWelcomeRequest {
   string name = 1;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message GTWelcomeReply {
   string message = 1;
 }
