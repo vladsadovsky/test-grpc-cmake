@@ -6,6 +6,7 @@ if "%1"=="release" goto release
 if "%1"=="vsdebug" goto vsdebug
 if "%1"=="vsrelease" goto vsrelease
 if "%1"=="sln" goto sln
+if "%1"== "test" goto test
 goto release
 
 :clean
@@ -61,6 +62,10 @@ goto done
 @echo Building release in build\win\release with Ninja
 cmake -G "Ninja" -B build\win\release -S . -DCMAKE_BUILD_TYPE=Release 
 ninja -v -C build\win\release all
+goto done
+
+:test
+start build\win\debug\gt_server.exe & timeout 1 & build\win\debug\gt_client.exe
 goto done
 
 :done
