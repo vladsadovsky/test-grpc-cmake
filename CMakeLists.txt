@@ -12,11 +12,8 @@ FetchContent_Declare(
   GIT_TAG        v1.45.2)
 FetchContent_MakeAvailable(grpc)
 
-#set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
-
-
-# Proto file
-get_filename_component(gt_proto "./gtproto.proto" ABSOLUTE)
+# Proto file location - to be added as an include directory later
+get_filename_component(gt_proto "./gt.proto" ABSOLUTE)
 get_filename_component(gt_proto_path "${gt_proto}" PATH)
 
 # Generated sources
@@ -46,7 +43,7 @@ target_link_libraries(gt_grpc_proto
     grpc++
     libprotobuf)
 
-# Targets greeter_[async_](client|server)
+# Targets gt_(client|server)
 foreach(_target
   gt_client gt_server)
   add_executable(${_target} "${_target}.cpp")
