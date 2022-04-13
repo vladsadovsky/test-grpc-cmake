@@ -5,6 +5,7 @@ project(HelloWorld C CXX)
 set (CMAKE_CXX_STANDARD 17)
 find_package(Threads REQUIRED)
 
+#Nb: use specific tag for grpc release - to avoid default to latest
 include(FetchContent)
 FetchContent_Declare(
   grpc
@@ -12,52 +13,53 @@ FetchContent_Declare(
   GIT_TAG        v1.45.2)
 FetchContent_MakeAvailable(grpc)
 
+# Indirect names of common grpc/protobuf utilities and libraries 
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
+set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
 set(_PROTOBUF_LIBPROTOBUF libprotobuf)
 set(_REFLECTION grpc++_reflection)
-set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
 set(_GRPC_GRPCPP grpc++)
 
 # Proto file location - to be added as an include directory later
-get_filename_component(gt_proto "./gt.proto" ABSOLUTE)
-get_filename_component(gt_proto_path "${gt_proto}" PATH)
+get_filename_component(GT_PROTO "./proto/gt.proto" ABSOLUTE)
+get_filename_component(GT_PROTO_PATH "${gt_proto}" PATH)
 
-# Generated sources
-set(gt_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/gt.pb.cc")
-set(gt_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/gt.pb.h")
-set(gt_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/gt.grpc.pb.cc")
-set(gt_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/gt.grpc.pb.h")
+# Run protobuf compiler as a custom step
+set(GT_PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/gt.pb.cc")
+set(GT_PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/gt.pb.h")
+set(GT_GRPC_SRCS "${CMAKE_CURRENT_BINARY_DIR}/gt.grpc.pb.cc")
+set(GT_GRPC_HDRS "${CMAKE_CURRENT_BINARY_DIR}/gt.grpc.pb.h")
 add_custom_command(
-      OUTPUT "${gt_proto_srcs}" "${gt_proto_hdrs}" "${gt_grpc_srcs}" "${gt_grpc_hdrs}"
-      COMMAND protoc
+      OUTPUT "${GT_PROTO_SRCS}" "${GT_PROTO_HDRS}" "${GT_GRPC_SRCS}" "${GT_GRPC_HDRS}"
+      COMMAND ${_PROTOBUF_PROTOC}
       ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
         --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-        -I "${gt_proto_path}"
+        -I "${GT_PROTO_PATH}"
         --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${gt_proto}"
-      DEPENDS "${gt_proto}")
+        "${GT_PROTO}"
+      DEPENDS "${GT_PROTO}")
 
-# Include generated *.pb.h files
+# Add build directory to include generated *.pb.h files
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-# gt_grpc_proto
+# Build gt_grpc_proto library
 add_library(gt_grpc_proto
-  ${gt_grpc_srcs}
-  ${gt_grpc_hdrs}
-  ${gt_proto_srcs}
-  ${gt_proto_hdrs})
+  ${GT_GRPC_SRCS}
+  ${GT_GRPC_HDRS}
+  ${GT_PROTO_SRCS}
+  ${GT_PROTO_HDRS})
 target_link_libraries(gt_grpc_proto
     grpc++
     ${_REFLECTION}
-    libprotobuf)
+    ${_PROTOBUF_LIBPROTOBUF})
 
 # Targets gt_(client|server)
 foreach(_target
   gt_client gt_server)
-  add_executable(${_target} "${_target}.cpp")
+  add_executable(${_target} "./src/${_target}.cpp")
   target_link_libraries(${_target}
     gt_grpc_proto
-    grpc++
+    ${_GRPC_GRPCPP}
     ${_REFLECTION}
-    libprotobuf)
+    ${_PROTOBUF_LIBPROTOBUF})
 endforeach()
